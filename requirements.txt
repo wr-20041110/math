@@ -1,0 +1,2 @@
+pytest>=7.0
+# tkinter is included with Python (no extra install needed)
