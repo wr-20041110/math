@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mathpractice"
+version = "2.0.0"
+description = "口算练习系统 —— 面向对象 + 数据处理 + 自动判题"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+authors = [
+    {name = "XiaoQiang & XiaoYu"},
+]
+
+[project.scripts]
+mathpractice = "mathpractice.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
