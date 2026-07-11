@@ -1,0 +1,29 @@
+{
+    "python.analysis.extraPaths": [
+        "arithmetic-practice",
+        "arithmetic-practice/src",
+        "arithmetic-practice-oop",
+        "arithmetic-practice-oop/src",
+        "arithmetic-practice-dataproc",
+        "arithmetic-practice-dataproc/src",
+        "arithmetic-practice-refactored",
+        "arithmetic-practice-refactored/src",
+        "arithmetic-practice-gui",
+        "arithmetic-practice-gui/src",
+        "arithmetic-practice-db",
+        "arithmetic-practice-db/src",
+        "arithmetic-practice-web",
+        "arithmetic-practice-web/src"
+    ],
+    "python.analysis.typeCheckingMode": "basic",
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [
+        "arithmetic-practice",
+        "arithmetic-practice-oop",
+        "arithmetic-practice-dataproc",
+        "arithmetic-practice-refactored",
+        "arithmetic-practice-gui",
+        "arithmetic-practice-db",
+        "arithmetic-practice-web"
+    ]
+}
