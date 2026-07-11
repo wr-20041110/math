@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}批改结果 - 口算练习系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header {% if score and score['percentage'] >= 80 %}bg-success{% elif score and score['percentage'] >= 60 %}bg-warning{% else %}bg-danger{% endif %} text-white">
+                <h5 class="mb-0"><i class="bi bi-check2-circle"></i> 批改结果</h5>
+            </div>
+            <div class="card-body">
+                {% if score %}
+                <!-- 成绩摘要 -->
+                <div class="row text-center mb-4">
+                    <div class="col-4">
+                        <div class="display-4 text-primary">{{ score['total'] }}</div>
+                        <small class="text-muted">总题数</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="display-4 text-success">{{ score['correct'] }}</div>
+                        <small class="text-muted">正确</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="display-4 text-danger">{{ score['wrong'] }}</div>
+                        <small class="text-muted">错误</small>
+                    </div>
+                </div>
+
+                <!-- 得分百分比 -->
+                <div class="text-center mb-4">
+                    <h1 class="display-1 {% if score['percentage'] >= 80 %}text-success{% elif score['percentage'] >= 60 %}text-warning{% else %}text-danger{% endif %}">
+                        {{ score['percentage'] }}%
+                    </h1>
+                    <p class="text-muted">
+                        学生: <strong>{{ student }}</strong> |
+                        习题: <code>{{ exercise.exercise_id }}</code>
+                    </p>
+                </div>
+
+                <!-- 错题列表 -->
+                {% if score['wrong_indices'] %}
+                <div class="alert alert-warning">
+                    <h6><i class="bi bi-exclamation-triangle"></i> 错题号:</h6>
+                    <p class="mb-0">
+                        {% for idx in score['wrong_indices'] %}
+                        <span class="badge bg-danger me-1">第 {{ idx }} 题</span>
+                        {% endfor %}
+                    </p>
+                </div>
+                {% else %}
+                <div class="alert alert-success text-center">
+                    <h4><i class="bi bi-emoji-smile"></i> 全部正确！太棒了！</h4>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-hourglass-split" style="font-size: 3rem;"></i>
+                    <p class="mt-3">暂无批改结果</p>
+                </div>
+                {% endif %}
+
+                <!-- 操作按钮 -->
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('main.index') }}" class="btn btn-primary">
+                        <i class="bi bi-house"></i> 返回首页
+                    </a>
+                    <a href="{{ url_for('main.practice', exercise_id=exercise.exercise_id) }}"
+                       class="btn btn-outline-success ms-2">
+                        <i class="bi bi-arrow-repeat"></i> 重新练习
+                    </a>
+                    <a href="{{ url_for('main.analysis') }}?student={{ student }}"
+                       class="btn btn-outline-info ms-2">
+                        <i class="bi bi-bar-chart"></i> 查看分析
+                    </a>
+                    <a href="{{ url_for('main.export_word', exercise_id=exercise.exercise_id) }}"
+                       class="btn btn-outline-secondary ms-2">
+                        <i class="bi bi-download"></i> 下载Word
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

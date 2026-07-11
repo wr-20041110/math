@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block title %}成绩分析 - 口算练习系统{% endblock %}
+
+{% block content %}
+<h3 class="mb-4"><i class="bi bi-bar-chart"></i> 成绩分析</h3>
+
+<!-- 学生查询 -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-6">
+                <label for="student" class="form-label">查询学生个人分析</label>
+                <input type="text" class="form-control" id="student"
+                       name="student" placeholder="输入学生姓名"
+                       value="{{ student_name }}">
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> 查询
+                </button>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <a href="{{ url_for('main.analysis') }}" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-x-circle"></i> 清除
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if student_data %}
+<!-- 学生个人趋势图 -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-graph-up"></i> {{ student_name }} 成绩趋势</h5>
+    </div>
+    <div class="card-body text-center">
+        <img id="trend-chart" src="" alt="成绩趋势图" class="img-fluid" style="max-height: 400px;">
+        <div id="trend-loading" class="text-muted py-4">
+            <div class="spinner-border" role="status"></div>
+            <p>加载图表中...</p>
+        </div>
+    </div>
+</div>
+
+<!-- 学生个人弱项 -->
+{% if student_weak %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-exclamation-diamond"></i> {{ student_name }} 弱项题目</h5>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>题目</th>
+                    <th>正确答案</th>
+                    <th>错误次数</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for w in student_weak %}
+                <tr>
+                    <td><code>{{ w['left_operand'] }} {{ w['operator'] }} {{ w['right_operand'] }}</code></td>
+                    <td>{{ w['correct_answer'] }}</td>
+                    <td><span class="badge bg-danger">{{ w['wrong_count'] }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endif %}
+
+<div class="row">
+    <!-- 全班概览 -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-people"></i> 全班概览</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if overview %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>姓名</th>
+                                <th>练习次数</th>
+                                <th>平均分</th>
+                                <th>最佳</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in overview %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('main.analysis') }}?student={{ r['name'] }}">
+                                        <strong>{{ r['name'] }}</strong>
+                                    </a>
+                                </td>
+                                <td>{{ r['total_sessions'] }}</td>
+                                <td>
+                                    <span class="badge {% if r['avg_score'] >= 80 %}bg-success{% elif r['avg_score'] >= 60 %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ r['avg_score'] }}%
+                                    </span>
+                                </td>
+                                <td>{{ r['best_score'] }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">暂无数据</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局弱项 -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> 全局弱项 Top 10</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if weak_all %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>题目</th>
+                                <th>错误率</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for w in weak_all[:10] %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td><code>{{ w['left_operand'] }} {{ w['operator'] }} {{ w['right_operand'] }}</code></td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-danger" style="width: {{ w['error_rate'] }}%">
+                                            {{ w['error_rate'] }}%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">暂无弱项数据</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 全班对比图 -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-bar-chart-fill"></i> 全班成绩对比</h5>
+    </div>
+    <div class="card-body text-center">
+        <img id="comparison-chart" src="" alt="全班成绩对比图" class="img-fluid">
+        <div id="comparison-loading" class="text-muted py-4">
+            <div class="spinner-border" role="status"></div>
+            <p>加载图表中...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// 加载图表
+document.addEventListener('DOMContentLoaded', function() {
+    {% if student_data %}
+    // 加载学生趋势图
+    fetch('/api/chart/trend?student={{ student_name }}')
+        .then(r => r.json())
+        .then(data => {
+            if (data.chart) {
+                document.getElementById('trend-chart').src = data.chart;
+                document.getElementById('trend-loading').style.display = 'none';
+            }
+        })
+        .catch(() => {
+            document.getElementById('trend-loading').innerHTML = '<p class="text-danger">图表加载失败</p>';
+        });
+    {% endif %}
+
+    // 加载全班对比图
+    fetch('/api/chart/comparison')
+        .then(r => r.json())
+        .then(data => {
+            if (data.chart) {
+                document.getElementById('comparison-chart').src = data.chart;
+                document.getElementById('comparison-loading').style.display = 'none';
+            }
+        })
+        .catch(() => {
+            document.getElementById('comparison-loading').innerHTML = '<p class="text-danger">图表加载失败</p>';
+        });
+});
+</script>
+{% endblock %}

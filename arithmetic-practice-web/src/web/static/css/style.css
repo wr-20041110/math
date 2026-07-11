@@ -1,0 +1,214 @@
+/* ================================================================
+   口算练习系统 —— 样式表
+   移动优先 (Mobile-First) 响应式设计
+   ================================================================ */
+
+/* ---- 基础变量 ---- */
+:root {
+    --primary: #0d6efd;
+    --success: #198754;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --border-radius: 8px;
+}
+
+/* ---- 习题网格 (移动端: 1列, 平板: 2列, 桌面: 3-4列) ---- */
+.problem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.problem-item {
+    border: 2px solid #e0e0e0;
+    border-radius: var(--border-radius);
+    padding: 12px;
+    text-align: center;
+    transition: all 0.2s ease;
+    background: #fafafa;
+}
+
+.problem-item:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+    background: #fff;
+}
+
+.problem-item.correct {
+    border-color: var(--success);
+    background: #f0fff4;
+}
+
+.problem-item.wrong {
+    border-color: var(--danger);
+    background: #fff5f5;
+}
+
+.problem-label {
+    font-weight: 700;
+    color: #666;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+}
+
+.problem-expr {
+    font-size: 1.2rem;
+    font-weight: 600;
+    font-family: 'Consolas', 'Courier New', monospace;
+    margin-bottom: 8px;
+    white-space: nowrap;
+}
+
+/* ---- 答案输入框 ---- */
+.answer-input {
+    width: 100%;
+    max-width: 100px;
+    min-height: 44px;       /* 触控友好 */
+    font-size: 1.2rem;
+    text-align: center;
+    border-radius: 6px;
+    margin: 0 auto;
+    display: block;
+}
+
+/* 移动端自动放大字体防止iOS缩放 */
+@media (max-width: 768px) {
+    .answer-input {
+        font-size: 18px;
+    }
+}
+
+/* ---- 反馈图标 ---- */
+.feedback-icon {
+    height: 28px;
+    margin-top: 4px;
+    font-size: 1.3rem;
+}
+
+.feedback-icon.correct::after {
+    content: '✓';
+    color: var(--success);
+    font-weight: bold;
+}
+
+.feedback-icon.wrong::after {
+    content: '✗';
+    color: var(--danger);
+    font-weight: bold;
+}
+
+/* ---- 按钮 ---- */
+#submit-btn {
+    min-height: 48px;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+}
+
+#submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ---- 卡片阴影 ---- */
+.card {
+    border: none;
+    border-radius: 12px;
+}
+
+.card-header {
+    border-radius: 12px 12px 0 0 !important;
+}
+
+/* ---- 统计数字 ---- */
+.display-1, .display-4, .display-6 {
+    font-weight: 700;
+}
+
+/* ---- 响应式表格 ---- */
+.table-responsive {
+    border-radius: 8px;
+}
+
+/* ---- 进度条 ---- */
+.progress {
+    border-radius: 10px;
+}
+
+/* ---- 导航栏 ---- */
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+/* ================================================================
+   手机端适配 (宽度 ≤ 768px)
+   ================================================================ */
+@media (max-width: 768px) {
+    .problem-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .problem-expr {
+        font-size: 1rem;
+    }
+
+    .answer-input {
+        max-width: 80px;
+        min-height: 44px;
+    }
+
+    /* 按钮全宽 */
+    .btn-lg {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    /* 隐藏页脚 */
+    footer {
+        font-size: 0.75rem;
+    }
+
+    /* 统计数字缩小 */
+    .display-1 { font-size: 3rem; }
+    .display-4 { font-size: 2rem; }
+    .display-6 { font-size: 1.5rem; }
+
+    .container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    main.container {
+        margin-top: 0.5rem !important;
+    }
+}
+
+/* ================================================================
+   超小屏幕 (宽度 ≤ 480px)
+   ================================================================ */
+@media (max-width: 480px) {
+    .problem-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .problem-expr {
+        font-size: 1.1rem;
+    }
+
+    .problem-item {
+        padding: 10px;
+    }
+}
+
+/* ---- 打印样式 ---- */
+@media print {
+    .navbar, footer, #submit-btn, #result-area button {
+        display: none;
+    }
+    .problem-item {
+        border: 1px solid #ccc;
+        break-inside: avoid;
+    }
+}

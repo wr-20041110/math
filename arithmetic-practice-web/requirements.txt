@@ -1,0 +1,18 @@
+# Web框架
+flask>=2.3.0
+
+# Word文档导出
+python-docx>=0.8.11
+
+# 图表可视化
+matplotlib>=3.7.0
+
+# 测试
+pytest>=7.0
+pytest-cov>=4.0
+
+# 代码质量
+ruff>=0.1.0
+
+# SQLite（Python标准库，无需额外安装）
+# tkinter（Python标准库，无需额外安装）

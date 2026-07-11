@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}首页 - 口算练习系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- 左侧：快速开始 -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-play-circle"></i> 开始练习</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('main.generate_exercise') }}" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="student" class="form-label">学生姓名 *</label>
+                        <input type="text" class="form-control" id="student"
+                               name="student" placeholder="输入姓名"
+                               list="student-list" required autocomplete="off">
+                        <datalist id="student-list">
+                            {% for s in students %}
+                            <option value="{{ s['name'] }}">
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="type" class="form-label">习题类型</label>
+                        <select class="form-select" id="type" name="type">
+                            {% for val, label in exercise_types %}
+                            <option value="{{ val }}" {% if val == 'mixed' %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="count" class="form-label">题目数量</label>
+                        <select class="form-select" id="count" name="count">
+                            <option value="10">10 题</option>
+                            <option value="20" selected>20 题</option>
+                            <option value="30">30 题</option>
+                            <option value="50">50 题</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-pencil-square"></i> 开始练习
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 最近习题 -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-list-ul"></i> 最近习题集</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if exercises %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>习题ID</th>
+                                <th>类型</th>
+                                <th>题数</th>
+                                <th>时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ex in exercises %}
+                            <tr>
+                                <td><code>{{ ex['id'] }}</code></td>
+                                <td>
+                                    {% if ex['type'] == 'addition' %}<span class="badge bg-info">加法</span>
+                                    {% elif ex['type'] == 'subtraction' %}<span class="badge bg-warning">减法</span>
+                                    {% else %}<span class="badge bg-success">混合</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ ex['total_count'] }} 题</td>
+                                <td>{{ ex['created_at'][:10] if ex['created_at'] else '' }}</td>
+                                <td>
+                                    <a href="{{ url_for('main.practice', exercise_id=ex['id']) }}"
+                                       class="btn btn-sm btn-outline-primary">练习</a>
+                                    <a href="{{ url_for('main.export_word', exercise_id=ex['id']) }}"
+                                       class="btn btn-sm btn-outline-secondary">下载</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                    <p class="mt-2">暂无习题，开始生成第一套吧！</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧：系统状态 -->
+    <div class="col-lg-4">
+        <!-- 统计卡片 -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> 系统统计</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="display-6 text-primary">{{ stats.get('student_count', 0) }}</div>
+                        <small class="text-muted">注册学生</small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="display-6 text-success">{{ stats.get('exercise_count', 0) }}</div>
+                        <small class="text-muted">习题集</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="display-6 text-info">{{ stats.get('problem_count', 0) }}</div>
+                        <small class="text-muted">总题目</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="display-6 text-warning">{{ stats.get('score_count', 0) }}</div>
+                        <small class="text-muted">成绩记录</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 学生列表 -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-people"></i> 学生列表</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if students %}
+                <ul class="list-group list-group-flush">
+                    {% for s in students %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ s['name'] }}</strong>
+                            {% if s['grade'] %}
+                            <small class="text-muted ms-2">{{ s['grade'] }}</small>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('main.history', student=s['name']) }}"
+                           class="btn btn-sm btn-outline-info">查看</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="text-center text-muted py-3">
+                    <p>暂无注册学生</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
